@@ -54,3 +54,72 @@ extern void * xpollrem(void * p)
 
     return o;
 }
+
+extern void xpolladd(xpoll * o, xdescriptor * descriptor)
+{
+    xcheck(o == xnil && descriptor == xnil, "null pointer");
+
+    if(o && descriptor)
+    {
+        xassertion(descriptor->parent != xnil, "parent is already exist");
+        xassertion(descriptor->prev || descriptor->next, "critical => ...");
+
+        xsynclock(o->sync);
+        descriptor->parent = o;
+
+        descriptor->prev = o->tail;
+        o->tail = descriptor;
+
+        if(descriptor->prev)
+        {
+            descriptor->prev->next = descriptor;
+        }
+        else
+        {
+            o->head = descriptor;
+        }
+        o->descriptors = o->descriptors + 1;
+
+        xsyncunlock(o->sync);
+    }
+}
+
+extern void xpolldel(xpoll * o, xdescriptor * descriptor)
+{
+    xcheck(o == xnil || descriptor==xnil, "null pointer");
+
+    if(o && descriptor)
+    {
+        /**
+         * 고민스러운 부분이다. o 가 필요 없어 보이는데,
+         * 지워야 하나 ...
+         */
+        xassertion(descriptor->parent != 0, "invalid parent");
+        xsynclock(o->sync);
+        xdescriptor * prev = descriptor->prev;
+        xdescriptor * next = descriptor->next;
+        if(prev)
+        {
+            prev->next = next;
+        }
+        else
+        {
+            o->head = next;
+        }
+        if(next)
+        {
+            next->prev = prev;
+        }
+        else
+        {
+            o->tail = prev;
+        }
+        xuint32 descriptors = o->descriptors = o->descriptors - 1;
+        xsyncunlock(o->sync);
+    }
+}
+
+extern void xpollwait(xpoll * o)
+{
+    // TODO: IMPLEMENT THIS
+}

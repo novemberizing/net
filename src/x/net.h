@@ -314,6 +314,9 @@ struct xpoll
 #define xpollinit()         (xpoll) { xobj_type_poll, xpollrem, xnil, xnil, 0, xnil }
 extern xpoll * xpollnew(void);
 extern void * xpollrem(void * p);
+extern void xpolladd(xpoll * o, xdescriptor * descriptor);
+extern void xpolldel(xpoll * o, xdescriptor * descriptor);
+extern void xpollwait(xpoll * o);
 // extern void xpolladd(xdescriptor )
 
 #endif // __NOVEMBERIZING_X__NET__H__
