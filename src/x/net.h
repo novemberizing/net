@@ -309,9 +309,12 @@ struct xpoll
     xuint64 descriptors;
 
     xsync * sync;
+
+    void * internal;
+    xuint64 internalsize;
 };
 
-#define xpollinit()         (xpoll) { xobj_type_poll, xpollrem, xnil, xnil, 0, xnil }
+#define xpollinit()         (xpoll) { xobj_type_poll, xpollrem, xnil, xnil, 0, xnil, xnil, internalsize }
 extern xpoll * xpollnew(void);
 extern void * xpollrem(void * p);
 extern void xpolladd(xpoll * o, xdescriptor * descriptor);
